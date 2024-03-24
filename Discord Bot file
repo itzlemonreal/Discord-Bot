@@ -1,0 +1,60 @@
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
+// Replace 'your-token' with your actual bot token
+client.login('your-token');
+
+// Set the bot's custom status
+client.on('ready', () => {
+  client.user.setPresence({
+    status: 'online',
+    activity: {
+      name: 'Your custom status here',
+      type: 'Playing',
+    },
+  });
+});
+
+// Define the bot's commands
+client.on('message', (message) => {
+  if (!message.content.startsWith(client.prefix) || message.author.bot) return;
+
+  const args = message.content.slice(client.prefix.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+
+  if (command === 'ban') {
+    if (!message.member.permissions.has('BAN_MEMBERS')) {
+      return message.reply('You do not have permission to use this command.');
+    }
+    if (!args.length) {
+      return message.reply('You must specify a user to ban.');
+    }
+    const user = message.mentions.users.first();
+    if (!user) {
+      return message.reply('You must mention a user to ban.');
+    }
+    message.guild.members.ban(user, { reason: 'Discord TOS violation' });
+    message.reply(`User ${user.username} has been banned.`);
+  } else if (command === 'help') {
+    message.reply('List of available commands: `!ban`, `!help`, `!timeout`, `!support`.');
+  } else if (command === 'timeout') {
+    if (!message.member.permissions.has('MODERATE_MEMBERS')) {
+      return message.reply('You do not have permission to use this command.');
+    }
+    if (!args.length) {
+      return message.reply('You must specify a user and a duration to timeout.');
+    }
+    const user = message.mentions.users.first();
+    if (!user) {
+      return message.reply('You must mention a user to timeout.');
+    }
+    const duration = args[1];
+    message.guild.members.timeout(user, duration);
+    message.reply(`User ${user.username} has been timed out for ${duration}.`);
+  } else if (command === 'support') {
+    message.reply('For support, join our Discord community.');
+  }
+});
+
+
+"Replace the 'your-token' placeholder with your actual bot token. Make sure to install the discord.js library using npm install discord.js before running the bot. You can modify the on('message') event to add more commands or customize the existing ones."
